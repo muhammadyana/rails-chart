@@ -48,7 +48,7 @@ class ProductsController < ApplicationController
     
   @presentation =  RubySlides::Presentation.new
       
-  chart_title = "Chart Slide"
+  chart_title = "Chart Slide  exported from ruby"
   chart_series = [
     {
       column: "Col1",
@@ -57,6 +57,7 @@ class ProductsController < ApplicationController
     },
     {
       column: "Col2",
+      color: 'FF9800',
       rows:   ["A", "B", "C", "D"],
       values: ["2", "4", "6", "8"]
     }

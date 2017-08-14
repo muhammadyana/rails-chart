@@ -10,8 +10,12 @@ wb.styles do |style|
                             :alignment => { :horizontal => :center,
                                             :vertical => :center ,
                                             :wrap_text => true}
+	black_cell = style.add_style :bg_color => "00", :fg_color => "FF", :sz => 14, :alignment => { :horizontal=> :center }
+  blue_cell =  style.add_style  :bg_color => "0000FF", :fg_color => "FF", :sz => 20, :alignment => { :horizontal=> :center } 
+  top_bottom =  style.add_style :border => { :style => :thick, :color =>"FFFF0000", :edges => [:top, :bottom] }                                           
 	wb.add_worksheet(name: "Products") do |sheet|
-		sheet.add_row ['Produt title', 'Price'], style: [wrap_text]
+		sheet.add_row ['']
+		sheet.add_row ['Produt title', 'Price'], style: [wrap_text, blue_cell]
 	  @products.each do |product|
 
 	    sheet.add_row [product.title, product.price]

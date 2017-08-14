@@ -46,6 +46,24 @@ class ProductsController < ApplicationController
     # @products = Product.all
     # 
     
+  @presentation =  RubySlides::Presentation.new
+      
+  chart_title = "Chart Slide"
+  chart_series = [
+    {
+      column: "Col1",
+      rows:   ["Lorem", "Ipsum", "Dolar", "Ismet"],
+      values: ["1", "3", "5", "7"]
+    },
+    {
+      column: "Col2",
+      rows:   ["A", "B", "C", "D"],
+      values: ["2", "4", "6", "8"]
+    }
+  ]
+  @presentation.chart_slide chart_title, chart_series
+
+  @presentation.save('mps.pptx')
 
     @products = Product.order('created_at DESC')
     respond_to do |format|

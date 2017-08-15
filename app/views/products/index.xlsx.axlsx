@@ -47,6 +47,7 @@ wb.styles do |style|
                        color: @products.map { "ff5722" }
 		  chart.valAxis.gridlines = false
 		  chart.catAxis.gridlines = false
+      # makae stacked chart
       chart.grouping = :stacked
 		end
   end

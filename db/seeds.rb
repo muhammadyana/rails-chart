@@ -8,6 +8,7 @@
 30.times do
   Product.create({
   	title: Faker::Superhero.name, 
-  	price: Faker::Commerce.price
+  	price: Faker::Commerce.price,
+  	quantity: Faker::Number.between(10, 20)
   })
 end

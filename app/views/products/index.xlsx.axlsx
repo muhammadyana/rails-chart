@@ -32,23 +32,163 @@ wb.styles do |style|
   wb.add_worksheet(name: "Products") do |sheet|
     @products.each do |product|
      # sheet.add_row [product.title, product.price], style: [highlight_title, highlight_cell]
-     sheet.add_row [product.title, product.price, product.quantity, ], style: [highlight_title, highlight_cell]
+      sheet.add_row [product.title, product.price, product.quantity, ], style: [highlight_title, highlight_cell]
       
-			
     end
-    sheet.add_chart(Axlsx::Bar3DChart, start_at: "F1", end_at: "N#{(@products.length * 1.5).floor}") do |chart|
+    sheet.add_chart(Axlsx::Bar3DChart, start_at: "F1", end_at: "N#{(@products.length * 1.5).floor}", title: "Chart Using stacked") do |chart|
 		  chart.add_series data: sheet["B1:B#{@products.length}"],
+                       data: sheet["C1:C#{@products.length}"],
 		                   labels: sheet["A1:A#{@products.length}"],
 		                   title: "Products by price",
-		                   colors: @products.map { "FF9800" }
+		                   color: @products.map { "FF9800" }
       chart.add_series data: sheet["C1:C#{@products.length}"],
+                       labels: sheet["A1:A#{@products.length}"],
                        title: "Products by Quantity",
-                       colors: @products.map { "ff5722" }
+                       color: @products.map { "ff5722" }
 		  chart.valAxis.gridlines = false
 		  chart.catAxis.gridlines = false
+      chart.grouping = :stacked
 		end
   end
 end
 
+# scatter chart
+wb.add_worksheet(:name => "Scatter Chart") do |sheet|
+  sheet.add_row ["First",  1,  5,  7,  9]
+  sheet.add_row ["",       1, 25, 49, 81]
+  sheet.add_row ["Second", 5,  2, 14,  9]
+  sheet.add_row ["",       5, 10, 15, 20]
+  sheet.add_chart(Axlsx::ScatterChart, :title => "example 7: Scatter Chart") do |chart|
+    chart.start_at 0, 4
+    chart.end_at 10, 19
+    chart.add_series :xData => sheet["B1:E1"], :yData => sheet["B2:E2"], :title => sheet["A1"], :color => "FF0000"
+    chart.add_series :xData => sheet["B3:E3"], :yData => sheet["B4:E4"], :title => sheet["A3"], :color => "00FF00"
+  end
+end
 
+# Line chart
+wb.add_worksheet(:name => "Line Chart") do |sheet|
+  sheet.add_row ["Simple Line Chart"]
+  sheet.add_row %w(first second)
+  4.times do
+    sheet.add_row [ rand(24)+1, rand(24)+1]
+  end
+  sheet.add_chart(Axlsx::Line3DChart, :title => "Simple 3D Line Chart", :rotX => 30, :rotY => 20) do |chart|
+    chart.start_at 0, 5
+    chart.end_at 10, 20
+    chart.add_series :data => sheet["A3:A6"], :title => sheet["A2"], :color => "0000FF"
+    chart.add_series :data => sheet["B3:B6"], :title => sheet["B2"], :color => "FF0000"
+    chart.catAxis.title = 'X Axis'
+    chart.valAxis.title = 'Y Axis'
+  end
+  sheet.add_chart(Axlsx::LineChart, :title => "Simple Line Chart", :rotX => 30, :rotY => 20) do |chart|
+    chart.start_at 0, 21
+    chart.end_at 10, 41
+    chart.add_series :data => sheet["A3:A6"], :title => sheet["A2"], :color => "FF0000", :show_marker => true, :smooth => true
+    chart.add_series :data => sheet["B3:B6"], :title => sheet["B2"], :color => "00FF00"
+    chart.catAxis.title = 'X Axis'
+    chart.valAxis.title = 'Y Axis'
+  end
+end
+
+wb.add_worksheet(:name => "Bar Chart") do |sheet|
+  sheet.add_row ["A Simple Bar Chart"]
+  %w(first second third).each { |label| sheet.add_row [label, rand(24)+1] }
+  sheet.add_chart(Axlsx::Bar3DChart, :start_at => "A6", :end_at => "F20") do |chart|
+    chart.add_series :data => sheet["B2:B4"], :labels => sheet["A2:A4"], :title => sheet["A1"], :colors => ["00FF00", "0000FF"]
+  end
+end
+
+# Pie Chart
+wb.add_worksheet(:name => "Pie Chart") do |sheet|
+  sheet.add_row ["Simple Pie Chart"]
+  %w(first second third).each { |label| sheet.add_row [label, rand(24)+1] }
+  sheet.add_chart(Axlsx::Pie3DChart, :start_at => [0,5], :end_at => [10, 20], :title => "example 3: Pie Chart") do |chart|
+    chart.add_series :data => sheet["B2:B4"], :labels => sheet["A2:A4"],  :colors => ['FF0000', '00FF00', '0000FF']
+  end
+end
+wb.add_worksheet(:name => "Table") do |sheet|
+  sheet.add_row ["Build Matrix"]
+  sheet.add_row ["Build", "Duration", "Finished", "Rvm"]
+  sheet.add_row ["19.1", "1 min 32 sec", "about 10 hours ago", "1.8.7"]
+  sheet.add_row ["19.2", "1 min 28 sec", "about 10 hours ago", "1.9.2"]
+  sheet.add_row ["19.3", "1 min 35 sec", "about 10 hours ago", "1.9.3"]
+  sheet.add_table "A2:D5", :name => 'Build Matrix', :style_info => { :name => "TableStyleMedium23" }
+end
+
+wb.add_worksheet(name: 'outline_level') do |sheet|
+  sheet.add_row [1, 2, 3, Time.now, 5, 149455.15]
+  sheet.add_row [1, 2, 5, 6, 5,14100.19]
+  sheet.add_row [9500002267, 1212, 1212, 5,14100.19]
+  sheet.outline_level_rows 0, 2
+  sheet.outline_level_columns 0, 2
+end
+
+wb.add_worksheet(:name => "Cell Level Style Overrides") do |sheet|
+
+  # this will set the font size for each cell.
+  sheet.add_row ['col 1', 'col 2', 'col 3', 'col 4'], :sz => 16
+
+  sheet.add_row [1, 2, 3, "=SUM(A2:C2)"]
+  sheet.add_row %w(u shadow sz b i strike outline)
+  sheet.rows.last.cells[0].u = :double
+  sheet.rows.last.cells[1].shadow = true
+  sheet.rows.last.cells[2].sz = 20
+  sheet.rows.last.cells[3].b = true
+  sheet.rows.last.cells[4].i = true
+  sheet.rows.last.cells[5].strike = true
+  sheet.rows.last.cells[6].outline = 1
+  # You can also apply cell style overrides to a range of cells
+  sheet["A1:D1"].each { |c| c.color = "FF0000" }
+  sheet['A1:D2'].each { |c| c.style = Axlsx::STYLE_THIN_BORDER }
+end
+
+ # Stuff like this is why I LOVE RUBY
+  # If you dont know about hash default values
+  # LEARN IT! LIVE IT! LOVE IT!
+  defaults =  { :style => :thick, :color => "000000" }
+  borders = Hash.new do |hash, key|
+    hash[key] = wb.styles.add_style :border => defaults.merge( { :edges => key.to_s.split('_').map(&:to_sym) } )
+  end
+  top_row =  [0, borders[:top_left], borders[:top], borders[:top], borders[:top_right]]
+  middle_row = [0, borders[:left], nil, nil, borders[:right]]
+  bottom_row = [0, borders[:bottom_left], borders[:bottom], borders[:bottom], borders[:bottom_right]]
+
+  wb.add_worksheet(:name => "Surrounding Border") do |ws|
+    ws.add_row []
+    ws.add_row ['', 1,2,3,4], :style => top_row
+    ws.add_row ['', 5,6,7,8], :style => middle_row
+    ws.add_row ['', 9, 10, 11, 12]
+
+    #This works too!
+    ws.rows.last.style = bottom_row
+
+  end
+
+wb.styles do |s|
+  head = s.add_style :bg_color => "00", :fg_color => "FF"
+  percent = s.add_style :num_fmt => 9
+  wb.add_worksheet(:name => "Columns and Rows") do |sheet|
+    # Note: you must add rows to the document *BEFORE* applying column styles to them
+    sheet.add_row ['col 1', 'col 2', 'col 3', 'col 4', 'col5']
+    sheet.add_row [1, 2, 0.3, 4, 5.0]
+    sheet.add_row [1, 2, 0.2, 4, 5.0]
+    sheet.add_row [1, 2, 0.1, 4, 5.0]
+
+    #apply the percent style to the column at index 2 skipping the first row.
+    sheet.col_style 2, percent, :row_offset => 1
+
+    # apply the head style to the first row.
+    sheet.row_style 0, head
+
+    #Hide the 5th column
+    sheet.column_info[4].hidden = true
+
+    #Set the second column outline level
+    sheet.column_info[1].outlineLevel = 2
+
+    sheet.rows[3].hidden = true
+    sheet.rows[1].outlineLevel = 2
+  end
+end
 
